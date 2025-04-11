@@ -16,11 +16,34 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase credentials. Make sure you have connected to Supabase properly.');
 }
 
-// Create the client with fallback empty strings to prevent crash, but the client won't work
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || ''
-);
+// Create a dummy client if credentials are missing
+// This allows the app to at least load without crashing
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : {
+      from: () => ({
+        select: () => ({
+          eq: () => ({
+            single: async () => ({ data: null, error: new Error('Supabase not configured') }),
+          }),
+          gte: () => ({
+            order: async () => ({ data: [], error: new Error('Supabase not configured') }),
+          }),
+        }),
+        insert: () => ({
+          select: () => ({
+            single: async () => ({ data: null, error: new Error('Supabase not configured') }),
+          }),
+        }),
+        update: () => ({
+          eq: () => ({
+            select: () => ({
+              single: async () => ({ data: null, error: new Error('Supabase not configured') }),
+            }),
+          }),
+        }),
+      }),
+    };
 
 export const getPosts = async (): Promise<Post[]> => {
   try {
