@@ -2,6 +2,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types/post';
 import { supabase as supabaseClient } from '@/integrations/supabase/client';
+import { Database } from '@/integrations/supabase/types';
 
 // We'll use the Supabase client that's automatically configured by Lovable
 export const supabase = supabaseClient;
@@ -29,32 +30,42 @@ export const getPosts = async (): Promise<Post[]> => {
 };
 
 export const createPost = async (post: Omit<Post, 'id'>): Promise<Post> => {
-  const { data, error } = await supabase
-    .from('posts')
-    .insert(post)
-    .select()
-    .single();
-  
-  if (error) {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .insert(post)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating post:', error);
+      throw error;
+    }
+    
+    return data as Post;
+  } catch (error) {
     console.error('Error creating post:', error);
     throw error;
   }
-  
-  return data as Post;
 };
 
 export const updatePullingUp = async (postId: string, currentCount: number): Promise<Post> => {
-  const { data, error } = await supabase
-    .from('posts')
-    .update({ pullingUp: currentCount + 1 })
-    .eq('id', postId)
-    .select()
-    .single();
-  
-  if (error) {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .update({ pullingUp: currentCount + 1 })
+      .eq('id', postId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating pulling up count:', error);
+      throw error;
+    }
+    
+    return data as Post;
+  } catch (error) {
     console.error('Error updating pulling up count:', error);
     throw error;
   }
-  
-  return data as Post;
 };
