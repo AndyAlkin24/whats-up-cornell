@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Post, TagType } from '@/types/post';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from '@/components/ui/use-toast';
+import { getPosts, createPost, updatePullingUp } from '@/lib/supabase';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface PostContextType {
   posts: Post[];
@@ -22,62 +24,54 @@ export const usePostContext = () => {
 };
 
 export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // Load posts from localStorage on mount
-  useEffect(() => {
-    const loadPosts = () => {
-      try {
-        const savedPosts = localStorage.getItem('cornellPosts');
-        if (savedPosts) {
-          const parsedPosts = JSON.parse(savedPosts) as Post[];
-          
-          // Filter out expired posts (older than 12 hours)
-          const currentTime = Date.now();
-          const twelveHoursMs = 12 * 60 * 60 * 1000;
-          const validPosts = parsedPosts.filter(
-            post => currentTime - post.timestamp < twelveHoursMs
-          );
-          
-          setPosts(validPosts);
-        }
-      } catch (error) {
-        console.error('Error loading posts:', error);
-        toast({
-          title: "Error loading posts",
-          description: "There was a problem loading saved posts.",
-          variant: "destructive"
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    loadPosts();
-    
-    // Set up interval to check for expired posts
-    const interval = setInterval(() => {
-      setPosts(currentPosts => {
-        const currentTime = Date.now();
-        const twelveHoursMs = 12 * 60 * 60 * 1000;
-        return currentPosts.filter(
-          post => currentTime - post.timestamp < twelveHoursMs
-        );
+  // Query to fetch posts
+  const { data: posts = [], isLoading: loading } = useQuery({
+    queryKey: ['posts'],
+    queryFn: getPosts,
+    refetchInterval: 60000, // Refetch every minute to check for expired posts
+  });
+
+  // Mutation to add a new post
+  const addPostMutation = useMutation({
+    mutationFn: (newPost: Omit<Post, 'id'>) => createPost(newPost),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast({
+        title: "Post created",
+        description: "Your post is now live!",
       });
-    }, 60000); // Check every minute
-    
-    return () => clearInterval(interval);
-  }, []);
+    },
+    onError: (error) => {
+      console.error('Error adding post:', error);
+      toast({
+        title: "Error creating post",
+        description: "There was a problem creating your post.",
+        variant: "destructive"
+      });
+    },
+  });
 
-  // Save posts to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('cornellPosts', JSON.stringify(posts));
-  }, [posts]);
+  // Mutation to increment pullingUp count
+  const updatePullingUpMutation = useMutation({
+    mutationFn: ({ postId, currentCount }: { postId: string; currentCount: number }) => 
+      updatePullingUp(postId, currentCount),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error) => {
+      console.error('Error updating pulling up count:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem updating the count.",
+        variant: "destructive"
+      });
+    },
+  });
 
   const addPost = (message: string, location?: string, tags: TagType[] = []) => {
-    const newPost: Post = {
-      id: uuidv4(),
+    const newPost: Omit<Post, 'id'> = {
       message,
       location,
       tags,
@@ -85,25 +79,26 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
       pullingUp: 0
     };
     
-    setPosts(prev => [newPost, ...prev]);
-    toast({
-      title: "Post created",
-      description: "Your post is now live!",
-    });
+    addPostMutation.mutate(newPost);
   };
 
   const incrementPullingUp = (postId: string) => {
-    setPosts(prev => 
-      prev.map(post => 
-        post.id === postId 
-          ? { ...post, pullingUp: post.pullingUp + 1 } 
-          : post
-      )
-    );
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    
+    updatePullingUpMutation.mutate({ 
+      postId, 
+      currentCount: post.pullingUp 
+    });
   };
 
   return (
-    <PostContext.Provider value={{ posts, addPost, incrementPullingUp, loading }}>
+    <PostContext.Provider value={{ 
+      posts, 
+      addPost, 
+      incrementPullingUp, 
+      loading: loading || addPostMutation.isPending || updatePullingUpMutation.isPending 
+    }}>
       {children}
     </PostContext.Provider>
   );
