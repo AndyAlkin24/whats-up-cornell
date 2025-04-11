@@ -2,27 +2,46 @@
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types/post';
 
+// Check if environment variables are available
 // These environment variables are automatically injected by Lovable's Supabase integration
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Log for debugging
+console.log('Supabase URL:', supabaseUrl);
+console.log('Supabase Anon Key:', supabaseAnonKey ? 'Present' : 'Missing');
+
+// Handle potential missing values
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('Missing Supabase credentials. Make sure you have connected to Supabase properly.');
+}
+
+// Create the client with fallback empty strings to prevent crash, but the client won't work
+export const supabase = createClient(
+  supabaseUrl || '',
+  supabaseAnonKey || ''
+);
 
 export const getPosts = async (): Promise<Post[]> => {
-  const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .gte('timestamp', twelveHoursAgo.getTime())
-    .order('timestamp', { ascending: false });
-  
-  if (error) {
-    console.error('Error fetching posts:', error);
-    throw error;
+  try {
+    const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000);
+    
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .gte('timestamp', twelveHoursAgo.getTime())
+      .order('timestamp', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching posts:', error);
+      throw error;
+    }
+    
+    return data as Post[] || [];
+  } catch (error) {
+    console.error('Failed to fetch posts:', error);
+    return [];
   }
-  
-  return data as Post[];
 };
 
 export const createPost = async (post: Omit<Post, 'id'>): Promise<Post> => {
