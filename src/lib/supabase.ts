@@ -1,49 +1,10 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types/post';
+import { supabase as supabaseClient } from '@/integrations/supabase/client';
 
-// Check if environment variables are available
-// These environment variables are automatically injected by Lovable's Supabase integration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Log for debugging
-console.log('Supabase URL:', supabaseUrl);
-console.log('Supabase Anon Key:', supabaseAnonKey ? 'Present' : 'Missing');
-
-// Handle potential missing values
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase credentials. Make sure you have connected to Supabase properly.');
-}
-
-// Create a dummy client if credentials are missing
-// This allows the app to at least load without crashing
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : {
-      from: () => ({
-        select: () => ({
-          eq: () => ({
-            single: async () => ({ data: null, error: new Error('Supabase not configured') }),
-          }),
-          gte: () => ({
-            order: async () => ({ data: [], error: new Error('Supabase not configured') }),
-          }),
-        }),
-        insert: () => ({
-          select: () => ({
-            single: async () => ({ data: null, error: new Error('Supabase not configured') }),
-          }),
-        }),
-        update: () => ({
-          eq: () => ({
-            select: () => ({
-              single: async () => ({ data: null, error: new Error('Supabase not configured') }),
-            }),
-          }),
-        }),
-      }),
-    };
+// We'll use the Supabase client that's automatically configured by Lovable
+export const supabase = supabaseClient;
 
 export const getPosts = async (): Promise<Post[]> => {
   try {
