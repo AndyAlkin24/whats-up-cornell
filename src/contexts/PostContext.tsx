@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Post, TagType } from '@/types/post';
 import { Reply } from '@/types/reply';
@@ -12,7 +11,8 @@ import {
   getReplies,
   createReply,
   updateReplyPullingUp,
-  updateReplyFade
+  updateReplyFade,
+  supabase
 } from '@/lib/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -41,14 +41,12 @@ export const usePostContext = () => {
 export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient();
 
-  // Query to fetch posts
   const { data: posts = [], isLoading: loading } = useQuery({
     queryKey: ['posts'],
     queryFn: getPosts,
-    refetchInterval: 60000, // Refetch every minute to check for expired posts
+    refetchInterval: 60000,
   });
 
-  // Mutation to add a new post
   const addPostMutation = useMutation({
     mutationFn: (newPost: Omit<Post, 'id'>) => createPost(newPost),
     onSuccess: () => {
@@ -68,7 +66,6 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   });
 
-  // Mutation to increment pullingUp count
   const updatePullingUpMutation = useMutation({
     mutationFn: ({ postId, currentCount }: { postId: string; currentCount: number }) => 
       updatePullingUp(postId, currentCount),
@@ -85,7 +82,6 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   });
 
-  // Mutation to increment fade count
   const updateFadeMutation = useMutation({
     mutationFn: ({ postId, currentCount }: { postId: string; currentCount: number }) => 
       updateFade(postId, currentCount),
@@ -102,7 +98,6 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   });
 
-  // Mutations for replies
   const addReplyMutation = useMutation({
     mutationFn: (newReply: Omit<Reply, 'id'>) => createReply(newReply),
     onSuccess: (_, variables) => {
@@ -187,7 +182,6 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  // New functions for replies
   const getRepliesForPost = async (postId: string): Promise<Reply[]> => {
     try {
       return await getReplies(postId);
@@ -210,15 +204,12 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const incrementReplyPullingUp = (replyId: string) => {
-    // First we need to get the current reply count
-    // We'll assume the replies are already loaded in the component
-    // The component will need to pass the current count
     queryClient.fetchQuery({
       queryKey: ['reply', replyId],
       queryFn: async () => {
         const { data } = await supabase
           .from('replies')
-          .select('pullingUp')
+          .select('pullingup')
           .eq('id', replyId)
           .single();
         return data;
@@ -227,14 +218,13 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (data) {
         updateReplyPullingUpMutation.mutate({ 
           replyId, 
-          currentCount: data.pullingUp || 0
+          currentCount: data.pullingup || 0
         });
       }
     });
   };
 
   const incrementReplyFade = (replyId: string) => {
-    // Similar approach as incrementReplyPullingUp
     queryClient.fetchQuery({
       queryKey: ['reply', replyId],
       queryFn: async () => {

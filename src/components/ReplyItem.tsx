@@ -41,9 +41,9 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
           >
             <ThumbsUp className="h-3 w-3" />
             <span>Pulling Up</span>
-            {reply.pullingUp > 0 && (
+            {reply.pullingup > 0 && (
               <span className="ml-1 bg-cornell-red text-white px-1.5 py-0.5 rounded-full text-xs">
-                {reply.pullingUp}
+                {reply.pullingup}
               </span>
             )}
           </Button>

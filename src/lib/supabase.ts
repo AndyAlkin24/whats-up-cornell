@@ -1,3 +1,4 @@
+
 import { createClient } from '@supabase/supabase-js';
 import { Post } from '@/types/post';
 import { supabase as supabaseClient } from '@/integrations/supabase/client';
@@ -135,7 +136,7 @@ export const updateReplyPullingUp = async (replyId: string, currentCount: number
   try {
     const { data, error } = await supabase
       .from('replies')
-      .update({ pullingUp: currentCount + 1 })
+      .update({ pullingup: currentCount + 1 })
       .eq('id', replyId)
       .select()
       .single();
