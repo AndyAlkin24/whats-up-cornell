@@ -3,13 +3,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Post, TagType } from '@/types/post';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from '@/components/ui/use-toast';
-import { getPosts, createPost, updatePullingUp } from '@/lib/supabase';
+import { getPosts, createPost, updatePullingUp, updateFade } from '@/lib/supabase';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface PostContextType {
   posts: Post[];
   addPost: (message: string, location?: string, tags?: TagType[]) => void;
   incrementPullingUp: (postId: string) => void;
+  incrementFade: (postId: string) => void;
   loading: boolean;
 }
 
@@ -70,13 +71,31 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
   });
 
+  // Mutation to increment fade count
+  const updateFadeMutation = useMutation({
+    mutationFn: ({ postId, currentCount }: { postId: string; currentCount: number }) => 
+      updateFade(postId, currentCount),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    },
+    onError: (error) => {
+      console.error('Error updating fade count:', error);
+      toast({
+        title: "Error",
+        description: "There was a problem updating the count.",
+        variant: "destructive"
+      });
+    },
+  });
+
   const addPost = (message: string, location?: string, tags: TagType[] = []) => {
     const newPost: Omit<Post, 'id'> = {
       message,
       location,
       tags,
       timestamp: Date.now(),
-      pullingUp: 0
+      pullingUp: 0,
+      fade: 0
     };
     
     addPostMutation.mutate(newPost);
@@ -92,12 +111,23 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const incrementFade = (postId: string) => {
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+    
+    updateFadeMutation.mutate({ 
+      postId, 
+      currentCount: post.fade 
+    });
+  };
+
   return (
     <PostContext.Provider value={{ 
       posts, 
       addPost, 
-      incrementPullingUp, 
-      loading: loading || addPostMutation.isPending || updatePullingUpMutation.isPending 
+      incrementPullingUp,
+      incrementFade, 
+      loading: loading || addPostMutation.isPending || updatePullingUpMutation.isPending || updateFadeMutation.isPending
     }}>
       {children}
     </PostContext.Provider>

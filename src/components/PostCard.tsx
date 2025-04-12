@@ -2,7 +2,7 @@
 import React from 'react';
 import { Post } from '@/types/post';
 import { Button } from '@/components/ui/button';
-import { MapPin, ThumbsUp } from 'lucide-react';
+import { MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
 import Tag from '@/components/Tag';
 import { usePostContext } from '@/contexts/PostContext';
 import { formatDistanceToNow } from 'date-fns';
@@ -12,10 +12,14 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  const { incrementPullingUp } = usePostContext();
+  const { incrementPullingUp, incrementFade } = usePostContext();
   
   const handlePullingUp = () => {
     incrementPullingUp(post.id);
+  };
+  
+  const handleFade = () => {
+    incrementFade(post.id);
   };
   
   return (
@@ -44,20 +48,37 @@ const PostCard = ({ post }: PostCardProps) => {
       )}
       
       <div className="flex justify-between items-center mt-2">
-        <Button 
-          variant="outline" 
-          size="sm"
-          className="border-cornell-red text-cornell-red hover:bg-cornell-red/10 flex items-center gap-1"
-          onClick={handlePullingUp}
-        >
-          <ThumbsUp className="h-4 w-4" />
-          I'm Pulling Up
-          {post.pullingUp > 0 && (
-            <span className="ml-1 bg-cornell-red text-white px-2 py-0.5 rounded-full text-xs">
-              {post.pullingUp}
-            </span>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="border-cornell-red text-cornell-red hover:bg-cornell-red/10 flex items-center gap-1"
+            onClick={handlePullingUp}
+          >
+            <ThumbsUp className="h-4 w-4" />
+            I'm Pulling Up
+            {post.pullingUp > 0 && (
+              <span className="ml-1 bg-cornell-red text-white px-2 py-0.5 rounded-full text-xs">
+                {post.pullingUp}
+              </span>
+            )}
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            size="sm"
+            className="border-gray-500 text-gray-500 hover:bg-gray-500/10 flex items-center gap-1"
+            onClick={handleFade}
+          >
+            <ThumbsDown className="h-4 w-4" />
+            Fade
+            {post.fade > 0 && (
+              <span className="ml-1 bg-gray-500 text-white px-2 py-0.5 rounded-full text-xs">
+                {post.fade}
+              </span>
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

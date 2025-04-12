@@ -69,3 +69,24 @@ export const updatePullingUp = async (postId: string, currentCount: number): Pro
     throw error;
   }
 };
+
+export const updateFade = async (postId: string, currentCount: number): Promise<Post> => {
+  try {
+    const { data, error } = await supabase
+      .from('posts')
+      .update({ fade: currentCount + 1 })
+      .eq('id', postId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating fade count:', error);
+      throw error;
+    }
+    
+    return data as Post;
+  } catch (error) {
+    console.error('Error updating fade count:', error);
+    throw error;
+  }
+};

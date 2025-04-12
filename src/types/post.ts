@@ -8,4 +8,5 @@ export interface Post {
   tags: TagType[];
   timestamp: number;
   pullingUp: number;
+  fade: number;
 }
