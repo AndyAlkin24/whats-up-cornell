@@ -39,6 +39,41 @@ export type Database = {
         }
         Relationships: []
       }
+      replies: {
+        Row: {
+          fade: number | null
+          id: string
+          message: string
+          post_id: string
+          pullingup: number | null
+          timestamp: number
+        }
+        Insert: {
+          fade?: number | null
+          id?: string
+          message: string
+          post_id: string
+          pullingup?: number | null
+          timestamp: number
+        }
+        Update: {
+          fade?: number | null
+          id?: string
+          message?: string
+          post_id?: string
+          pullingup?: number | null
+          timestamp?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "replies_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

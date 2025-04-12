@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Post } from '@/types/post';
 import { Button } from '@/components/ui/button';
-import { MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { MapPin, ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
 import Tag from '@/components/Tag';
 import { usePostContext } from '@/contexts/PostContext';
 import { formatDistanceToNow } from 'date-fns';
+import ReplyForm from './ReplyForm';
+import ReplyList from './ReplyList';
 
 interface PostCardProps {
   post: Post;
@@ -13,6 +15,8 @@ interface PostCardProps {
 
 const PostCard = ({ post }: PostCardProps) => {
   const { incrementPullingUp, incrementFade } = usePostContext();
+  const [isReplying, setIsReplying] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
   
   const handlePullingUp = () => {
     incrementPullingUp(post.id);
@@ -20,6 +24,13 @@ const PostCard = ({ post }: PostCardProps) => {
   
   const handleFade = () => {
     incrementFade(post.id);
+  };
+
+  const toggleReplying = () => {
+    setIsReplying(!isReplying);
+    if (!isReplying && !showReplies) {
+      setShowReplies(true);
+    }
   };
   
   return (
@@ -39,7 +50,7 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
       )}
       
-      {post.tags.length > 0 && (
+      {post.tags && post.tags.length > 0 && (
         <div className="mb-4">
           {post.tags.map(tag => (
             <Tag key={tag} tag={tag} />
@@ -79,7 +90,30 @@ const PostCard = ({ post }: PostCardProps) => {
             )}
           </Button>
         </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={toggleReplying}
+          className="text-gray-600 hover:text-cornell-red hover:bg-cornell-red/10"
+        >
+          <MessageCircle className="h-4 w-4 mr-1" />
+          Reply
+        </Button>
       </div>
+
+      {isReplying && (
+        <ReplyForm 
+          postId={post.id} 
+          onCancel={() => setIsReplying(false)} 
+        />
+      )}
+
+      {showReplies && (
+        <div className="mt-3">
+          <ReplyList postId={post.id} />
+        </div>
+      )}
     </div>
   );
 };
