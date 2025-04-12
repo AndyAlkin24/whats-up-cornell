@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       posts: {
         Row: {
+          fade: number | null
           id: string
           location: string | null
           message: string
@@ -19,6 +20,7 @@ export type Database = {
           timestamp: number
         }
         Insert: {
+          fade?: number | null
           id?: string
           location?: string | null
           message: string
@@ -27,6 +29,7 @@ export type Database = {
           timestamp: number
         }
         Update: {
+          fade?: number | null
           id?: string
           location?: string | null
           message?: string
