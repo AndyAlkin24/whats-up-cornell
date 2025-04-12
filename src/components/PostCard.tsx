@@ -8,6 +8,7 @@ import { usePostContext } from '@/contexts/PostContext';
 import { formatDistanceToNow } from 'date-fns';
 import ReplyForm from './ReplyForm';
 import ReplyList from './ReplyList';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface PostCardProps {
   post: Post;
@@ -17,6 +18,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const { incrementPullingUp, incrementFade } = usePostContext();
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
+  const isMobile = useIsMobile();
   
   const handlePullingUp = () => {
     incrementPullingUp(post.id);
@@ -58,8 +60,8 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
       )}
       
-      <div className="flex justify-between items-center mt-2">
-        <div className="flex gap-2">
+      <div className={`flex ${isMobile ? 'flex-col gap-2' : 'justify-between items-center'} mt-2`}>
+        <div className="flex gap-2 flex-wrap">
           <Button 
             variant="outline" 
             size="sm"
@@ -95,7 +97,7 @@ const PostCard = ({ post }: PostCardProps) => {
           variant="ghost"
           size="sm"
           onClick={toggleReplying}
-          className="text-gray-600 hover:text-cornell-red hover:bg-cornell-red/10"
+          className={`text-gray-600 hover:text-cornell-red hover:bg-cornell-red/10 ${isMobile ? 'self-start mt-2' : ''}`}
         >
           <MessageCircle className="h-4 w-4 mr-1" />
           Reply
