@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Post, TagType } from '@/types/post';
 import { Reply } from '@/types/reply';
@@ -196,7 +197,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
       post_id: postId,
       message,
       timestamp: Date.now(),
-      pullingUp: 0,
+      pullingup: 0,
       fade: 0
     };
     
