@@ -4,7 +4,7 @@ import { usePostContext } from '@/contexts/PostContext';
 import { Reply } from '@/types/reply';
 import ReplyItem from './ReplyItem';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 
 interface ReplyListProps {

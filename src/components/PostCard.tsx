@@ -9,16 +9,23 @@ import { formatDistanceToNow } from 'date-fns';
 import ReplyForm from './ReplyForm';
 import ReplyList from './ReplyList';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useQuery } from '@tanstack/react-query';
+import { Badge } from '@/components/ui/badge';
 
 interface PostCardProps {
   post: Post;
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  const { incrementPullingUp, incrementFade } = usePostContext();
+  const { incrementPullingUp, incrementFade, getRepliesForPost } = usePostContext();
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const isMobile = useIsMobile();
+  
+  const { data: replies = [] } = useQuery({
+    queryKey: ['replies', post.id],
+    queryFn: () => getRepliesForPost(post.id),
+  });
   
   const handlePullingUp = () => {
     incrementPullingUp(post.id);
@@ -33,6 +40,10 @@ const PostCard = ({ post }: PostCardProps) => {
     if (!isReplying && !showReplies) {
       setShowReplies(true);
     }
+  };
+  
+  const toggleReplies = () => {
+    setShowReplies(!showReplies);
   };
   
   return (
@@ -93,15 +104,28 @@ const PostCard = ({ post }: PostCardProps) => {
           </Button>
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleReplying}
-          className={`text-gray-600 hover:text-cornell-red hover:bg-cornell-red/10 ${isMobile ? 'self-start mt-2' : ''}`}
-        >
-          <MessageCircle className="h-4 w-4 mr-1" />
-          Reply
-        </Button>
+        <div className="flex items-center gap-2">
+          {replies.length > 0 && (
+            <Badge 
+              variant="secondary" 
+              className="flex items-center gap-1"
+              onClick={toggleReplies}
+            >
+              <MessageCircle className="h-3 w-3" />
+              {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+            </Badge>
+          )}
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleReplying}
+            className={`text-gray-600 hover:text-cornell-red hover:bg-cornell-red/10 ${isMobile ? 'self-start' : ''}`}
+          >
+            <MessageCircle className="h-4 w-4 mr-1" />
+            Reply
+          </Button>
+        </div>
       </div>
 
       {isReplying && (
