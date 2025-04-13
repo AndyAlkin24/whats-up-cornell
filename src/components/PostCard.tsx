@@ -43,7 +43,9 @@ const PostCard = ({ post }: PostCardProps) => {
     }
   };
   
-  const toggleReplies = () => {
+  const toggleReplies = (e: React.MouseEvent) => {
+    // Prevent event propagation
+    e.stopPropagation();
     setShowReplies(!showReplies);
   };
   
@@ -138,7 +140,7 @@ const PostCard = ({ post }: PostCardProps) => {
 
       {showReplies && replies.length > 0 && (
         <div className="mt-3">
-          <ReplyList postId={post.id} />
+          <ReplyList postId={post.id} showReplies={showReplies} />
         </div>
       )}
     </div>

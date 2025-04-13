@@ -16,12 +16,14 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
   const handlePullingUp = (e: React.MouseEvent) => {
     // Prevent event propagation to parent elements
     e.stopPropagation();
+    e.preventDefault();
     incrementReplyPullingUp(reply.id);
   };
   
   const handleFade = (e: React.MouseEvent) => {
     // Prevent event propagation to parent elements
     e.stopPropagation();
+    e.preventDefault();
     incrementReplyFade(reply.id);
   };
   

@@ -9,9 +9,10 @@ import { useQuery } from '@tanstack/react-query';
 
 interface ReplyListProps {
   postId: string;
+  showReplies?: boolean;
 }
 
-const ReplyList = ({ postId }: ReplyListProps) => {
+const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
   const { getRepliesForPost } = usePostContext();
   const [expanded, setExpanded] = useState(true);
 
@@ -20,6 +21,13 @@ const ReplyList = ({ postId }: ReplyListProps) => {
     queryKey: ['replies', postId],
     queryFn: () => getRepliesForPost(postId),
   });
+
+  // Ensure that the expanded state follows the showReplies prop
+  useEffect(() => {
+    if (showReplies) {
+      setExpanded(true);
+    }
+  }, [showReplies]);
 
   if (isLoading) {
     return <div className="pl-6 py-2 text-sm text-gray-500">Loading replies...</div>;
@@ -36,7 +44,10 @@ const ReplyList = ({ postId }: ReplyListProps) => {
           variant="ghost"
           size="sm"
           className="text-gray-600 p-0 h-auto"
-          onClick={() => setExpanded(!expanded)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setExpanded(!expanded);
+          }}
         >
           {expanded ? (
             <ChevronUp className="h-4 w-4 mr-1" />
