@@ -39,8 +39,20 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
   }
 
   return (
-    <div className="mt-2">
-      <div className="flex items-center mb-2">
+    <div 
+      className="mt-2"
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+    >
+      <div 
+        className="flex items-center mb-2"
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+      >
         <Button
           variant="ghost"
           size="sm"
@@ -61,7 +73,13 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
       </div>
       
       {expanded && (
-        <div className="reply-items-container">
+        <div 
+          className="reply-items-container"
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
           {replies.map(reply => (
             <ReplyItem key={reply.id} reply={reply} />
           ))}

@@ -30,11 +30,17 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
   return (
     <div 
       className="pl-6 border-l-2 border-gray-200 mb-3"
-      onClick={(e) => e.stopPropagation()}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
     >
       <div 
         className="bg-gray-50 p-3 rounded-lg"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
       >
         <div className="flex justify-between items-start mb-2">
           <div className="text-xs text-gray-500">
@@ -46,7 +52,10 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
         
         <div 
           className="flex gap-2 mt-2"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
         >
           <Button 
             variant="outline" 

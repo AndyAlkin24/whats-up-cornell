@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Post } from '@/types/post';
 import { Button } from '@/components/ui/button';
@@ -28,15 +29,21 @@ const PostCard = ({ post }: PostCardProps) => {
     staleTime: 10000, // Consider replies fresh for 10 seconds
   });
   
-  const handlePullingUp = () => {
+  const handlePullingUp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     incrementPullingUp(post.id);
   };
   
-  const handleFade = () => {
+  const handleFade = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     incrementFade(post.id);
   };
 
-  const toggleReplying = () => {
+  const toggleReplying = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     setIsReplying(!isReplying);
     if (!isReplying && !showReplies) {
       setShowReplies(true);
@@ -50,15 +57,11 @@ const PostCard = ({ post }: PostCardProps) => {
     setShowReplies(!showReplies);
   };
 
-  // Add a click event listener to the document to detect clicks outside the post card
-  useEffect(() => {
-    // We don't need to add any cleanup here since we're just ensuring the replies stay visible
-  }, []);
-  
   return (
     <div 
       className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-4"
       ref={postCardRef}
+      onClick={(e) => e.stopPropagation()}
     >
       <div className="flex justify-between items-start mb-2">
         <div className="text-sm text-gray-500">
@@ -141,7 +144,12 @@ const PostCard = ({ post }: PostCardProps) => {
       </div>
 
       {isReplying && (
-        <div onClick={(e) => e.stopPropagation()}>
+        <div 
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
           <ReplyForm 
             postId={post.id} 
             onCancel={() => setIsReplying(false)} 
@@ -150,7 +158,13 @@ const PostCard = ({ post }: PostCardProps) => {
       )}
 
       {showReplies && replies.length > 0 && (
-        <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="mt-3" 
+          onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
+        >
           <ReplyList postId={post.id} showReplies={true} />
         </div>
       )}
