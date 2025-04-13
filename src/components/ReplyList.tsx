@@ -20,6 +20,7 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
   const { data: replies = [], isLoading } = useQuery({
     queryKey: ['replies', postId],
     queryFn: () => getRepliesForPost(postId),
+    staleTime: 10000, // Consider replies fresh for 10 seconds
   });
 
   // Ensure that the expanded state follows the showReplies prop
@@ -46,6 +47,7 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
           className="text-gray-600 p-0 h-auto"
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
             setExpanded(!expanded);
           }}
         >
@@ -59,7 +61,7 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
       </div>
       
       {expanded && (
-        <div>
+        <div className="reply-items-container">
           {replies.map(reply => (
             <ReplyItem key={reply.id} reply={reply} />
           ))}

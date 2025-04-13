@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Post } from '@/types/post';
 import { Button } from '@/components/ui/button';
 import { MapPin, ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
@@ -21,6 +20,7 @@ const PostCard = ({ post }: PostCardProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const isMobile = useIsMobile();
+  const postCardRef = useRef<HTMLDivElement>(null);
   
   const { data: replies = [], refetch: refetchReplies } = useQuery({
     queryKey: ['replies', post.id],
@@ -46,11 +46,20 @@ const PostCard = ({ post }: PostCardProps) => {
   const toggleReplies = (e: React.MouseEvent) => {
     // Prevent event propagation
     e.stopPropagation();
+    e.preventDefault();
     setShowReplies(!showReplies);
   };
+
+  // Add a click event listener to the document to detect clicks outside the post card
+  useEffect(() => {
+    // We don't need to add any cleanup here since we're just ensuring the replies stay visible
+  }, []);
   
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-4">
+    <div 
+      className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-4"
+      ref={postCardRef}
+    >
       <div className="flex justify-between items-start mb-2">
         <div className="text-sm text-gray-500">
           {formatDistanceToNow(post.timestamp, { addSuffix: true })}
@@ -132,15 +141,17 @@ const PostCard = ({ post }: PostCardProps) => {
       </div>
 
       {isReplying && (
-        <ReplyForm 
-          postId={post.id} 
-          onCancel={() => setIsReplying(false)} 
-        />
+        <div onClick={(e) => e.stopPropagation()}>
+          <ReplyForm 
+            postId={post.id} 
+            onCancel={() => setIsReplying(false)} 
+          />
+        </div>
       )}
 
       {showReplies && replies.length > 0 && (
-        <div className="mt-3">
-          <ReplyList postId={post.id} showReplies={showReplies} />
+        <div className="mt-3" onClick={(e) => e.stopPropagation()}>
+          <ReplyList postId={post.id} showReplies={true} />
         </div>
       )}
     </div>

@@ -28,8 +28,14 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
   };
   
   return (
-    <div className="pl-6 border-l-2 border-gray-200 mb-3">
-      <div className="bg-gray-50 p-3 rounded-lg">
+    <div 
+      className="pl-6 border-l-2 border-gray-200 mb-3"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div 
+        className="bg-gray-50 p-3 rounded-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-start mb-2">
           <div className="text-xs text-gray-500">
             {formatDistanceToNow(reply.timestamp, { addSuffix: true })}
@@ -38,7 +44,10 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
         
         <p className="text-sm mb-2">{reply.message}</p>
         
-        <div className="flex gap-2 mt-2">
+        <div 
+          className="flex gap-2 mt-2"
+          onClick={(e) => e.stopPropagation()}
+        >
           <Button 
             variant="outline" 
             size="sm"
