@@ -15,6 +15,7 @@ const ReplyList = ({ postId }: ReplyListProps) => {
   const { getRepliesForPost } = usePostContext();
   const [expanded, setExpanded] = useState(true);
 
+  // Use the useQuery hook to fetch replies
   const { data: replies = [], isLoading } = useQuery({
     queryKey: ['replies', postId],
     queryFn: () => getRepliesForPost(postId),

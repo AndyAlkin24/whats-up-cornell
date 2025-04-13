@@ -22,9 +22,10 @@ const PostCard = ({ post }: PostCardProps) => {
   const [showReplies, setShowReplies] = useState(false);
   const isMobile = useIsMobile();
   
-  const { data: replies = [] } = useQuery({
+  const { data: replies = [], refetch: refetchReplies } = useQuery({
     queryKey: ['replies', post.id],
     queryFn: () => getRepliesForPost(post.id),
+    staleTime: 10000, // Consider replies fresh for 10 seconds
   });
   
   const handlePullingUp = () => {
@@ -108,7 +109,7 @@ const PostCard = ({ post }: PostCardProps) => {
           {replies.length > 0 && (
             <Badge 
               variant="secondary" 
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 cursor-pointer"
               onClick={toggleReplies}
             >
               <MessageCircle className="h-3 w-3" />
@@ -135,7 +136,7 @@ const PostCard = ({ post }: PostCardProps) => {
         />
       )}
 
-      {showReplies && (
+      {showReplies && replies.length > 0 && (
         <div className="mt-3">
           <ReplyList postId={post.id} />
         </div>
