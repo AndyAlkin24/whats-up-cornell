@@ -16,32 +16,18 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
   const handlePullingUp = (e: React.MouseEvent) => {
     // Prevent event propagation to parent elements
     e.stopPropagation();
-    e.preventDefault();
     incrementReplyPullingUp(reply.id);
   };
   
   const handleFade = (e: React.MouseEvent) => {
     // Prevent event propagation to parent elements
     e.stopPropagation();
-    e.preventDefault();
     incrementReplyFade(reply.id);
   };
   
   return (
-    <div 
-      className="pl-6 border-l-2 border-gray-200 mb-3"
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-    >
-      <div 
-        className="bg-gray-50 p-3 rounded-lg"
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-      >
+    <div className="pl-6 border-l-2 border-gray-200 mb-3">
+      <div className="bg-gray-50 p-3 rounded-lg">
         <div className="flex justify-between items-start mb-2">
           <div className="text-xs text-gray-500">
             {formatDistanceToNow(reply.timestamp, { addSuffix: true })}
@@ -50,13 +36,7 @@ const ReplyItem = ({ reply }: ReplyItemProps) => {
         
         <p className="text-sm mb-2">{reply.message}</p>
         
-        <div 
-          className="flex gap-2 mt-2"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
+        <div className="flex gap-2 mt-2">
           <Button 
             variant="outline" 
             size="sm"

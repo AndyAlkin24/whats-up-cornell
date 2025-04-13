@@ -39,29 +39,13 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
   }
 
   return (
-    <div 
-      className="mt-2"
-      onClick={(e) => {
-        e.stopPropagation();
-        e.preventDefault();
-      }}
-    >
-      <div 
-        className="flex items-center mb-2"
-        onClick={(e) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-      >
+    <div className="mt-2">
+      <div className="flex items-center mb-2">
         <Button
           variant="ghost"
           size="sm"
           className="text-gray-600 p-0 h-auto"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            setExpanded(!expanded);
-          }}
+          onClick={() => setExpanded(!expanded)}
         >
           {expanded ? (
             <ChevronUp className="h-4 w-4 mr-1" />
@@ -73,13 +57,7 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
       </div>
       
       {expanded && (
-        <div 
-          className="reply-items-container"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
+        <div className="reply-items-container">
           {replies.map(reply => (
             <ReplyItem key={reply.id} reply={reply} />
           ))}
