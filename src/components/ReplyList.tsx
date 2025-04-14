@@ -15,10 +15,15 @@ const ReplyList = ({ postId }: ReplyListProps) => {
   const { getRepliesForPost } = usePostContext();
   const [expanded, setExpanded] = useState(true);
 
-  const { data: replies = [], isLoading } = useQuery({
+  const { data: replies = [], isLoading, refetch } = useQuery({
     queryKey: ['replies', postId],
     queryFn: () => getRepliesForPost(postId),
   });
+
+  // Add a useEffect to refetch replies when the component mounts
+  useEffect(() => {
+    refetch();
+  }, [postId, refetch]);
 
   if (isLoading) {
     return <div className="pl-6 py-2 text-sm text-gray-500">Loading replies...</div>;

@@ -21,6 +21,7 @@ const ReplyForm = ({ postId, onCancel }: ReplyFormProps) => {
       return;
     }
     
+    console.log('Submitting reply:', { postId, message });
     addReplyToPost(postId, message);
     setMessage('');
     onCancel();
