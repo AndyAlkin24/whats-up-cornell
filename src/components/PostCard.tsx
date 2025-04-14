@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Post } from '@/types/post';
 import { Button } from '@/components/ui/button';
 import { MapPin, ThumbsUp, ThumbsDown, MessageCircle } from 'lucide-react';
@@ -21,48 +21,33 @@ const PostCard = ({ post }: PostCardProps) => {
   const [isReplying, setIsReplying] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const isMobile = useIsMobile();
-  const postCardRef = useRef<HTMLDivElement>(null);
   
-  const { data: replies = [], refetch: refetchReplies } = useQuery({
+  const { data: replies = [] } = useQuery({
     queryKey: ['replies', post.id],
     queryFn: () => getRepliesForPost(post.id),
-    staleTime: 10000, // Consider replies fresh for 10 seconds
   });
   
-  const handlePullingUp = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handlePullingUp = () => {
     incrementPullingUp(post.id);
   };
   
-  const handleFade = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const handleFade = () => {
     incrementFade(post.id);
   };
 
-  const toggleReplying = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const toggleReplying = () => {
     setIsReplying(!isReplying);
     if (!isReplying && !showReplies) {
       setShowReplies(true);
     }
   };
   
-  const toggleReplies = (e: React.MouseEvent) => {
-    // Prevent event propagation
-    e.stopPropagation();
-    e.preventDefault();
+  const toggleReplies = () => {
     setShowReplies(!showReplies);
   };
-
+  
   return (
-    <div 
-      className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-4"
-      ref={postCardRef}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="bg-white p-4 rounded-lg shadow-md border border-gray-200 mb-4">
       <div className="flex justify-between items-start mb-2">
         <div className="text-sm text-gray-500">
           {formatDistanceToNow(post.timestamp, { addSuffix: true })}
@@ -123,7 +108,7 @@ const PostCard = ({ post }: PostCardProps) => {
           {replies.length > 0 && (
             <Badge 
               variant="secondary" 
-              className="flex items-center gap-1 cursor-pointer"
+              className="flex items-center gap-1"
               onClick={toggleReplies}
             >
               <MessageCircle className="h-3 w-3" />
@@ -144,28 +129,15 @@ const PostCard = ({ post }: PostCardProps) => {
       </div>
 
       {isReplying && (
-        <div 
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
-          <ReplyForm 
-            postId={post.id} 
-            onCancel={() => setIsReplying(false)} 
-          />
-        </div>
+        <ReplyForm 
+          postId={post.id} 
+          onCancel={() => setIsReplying(false)} 
+        />
       )}
 
-      {showReplies && replies.length > 0 && (
-        <div 
-          className="mt-3" 
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-          }}
-        >
-          <ReplyList postId={post.id} showReplies={true} />
+      {showReplies && (
+        <div className="mt-3">
+          <ReplyList postId={post.id} />
         </div>
       )}
     </div>

@@ -9,26 +9,16 @@ import { useQuery } from '@tanstack/react-query';
 
 interface ReplyListProps {
   postId: string;
-  showReplies?: boolean;
 }
 
-const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
+const ReplyList = ({ postId }: ReplyListProps) => {
   const { getRepliesForPost } = usePostContext();
   const [expanded, setExpanded] = useState(true);
 
-  // Use the useQuery hook to fetch replies
   const { data: replies = [], isLoading } = useQuery({
     queryKey: ['replies', postId],
     queryFn: () => getRepliesForPost(postId),
-    staleTime: 10000, // Consider replies fresh for 10 seconds
   });
-
-  // Ensure that the expanded state follows the showReplies prop
-  useEffect(() => {
-    if (showReplies) {
-      setExpanded(true);
-    }
-  }, [showReplies]);
 
   if (isLoading) {
     return <div className="pl-6 py-2 text-sm text-gray-500">Loading replies...</div>;
@@ -57,7 +47,7 @@ const ReplyList = ({ postId, showReplies = true }: ReplyListProps) => {
       </div>
       
       {expanded && (
-        <div className="reply-items-container">
+        <div>
           {replies.map(reply => (
             <ReplyItem key={reply.id} reply={reply} />
           ))}

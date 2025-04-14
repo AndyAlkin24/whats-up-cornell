@@ -13,15 +13,11 @@ interface ReplyItemProps {
 const ReplyItem = ({ reply }: ReplyItemProps) => {
   const { incrementReplyPullingUp, incrementReplyFade } = usePostContext();
   
-  const handlePullingUp = (e: React.MouseEvent) => {
-    // Prevent event propagation to parent elements
-    e.stopPropagation();
+  const handlePullingUp = () => {
     incrementReplyPullingUp(reply.id);
   };
   
-  const handleFade = (e: React.MouseEvent) => {
-    // Prevent event propagation to parent elements
-    e.stopPropagation();
+  const handleFade = () => {
     incrementReplyFade(reply.id);
   };
   
